@@ -674,3 +674,13 @@ JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
 JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
 JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
 JavaScript warning: , line 0: WebGL warning: texImage: Alpha-premult and y-flip are deprecated for non-DOM-Element uploads.
+JavaScript warning: , line 0: WebGL warning: texImage: Alpha-premult and y-flip are deprecated for non-DOM-Element uploads.
+[Child 45126, Main Thread] WARNING: JSWindowActorChild::SendRawMessage (Conduits, ConduitClosed) not sent: !CanSend() || !mManager || !mManager->CanSend(): file /build/firefox-sx15yn/firefox-113.0.1+build1/dom/ipc/jsactor/JSWindowActorChild.cpp:57
+[Child 45126, Main Thread] WARNING: JSWindowActorChild::SendRawMessage (Conduits, ConduitClosed) not sent: !CanSend() || !mManager || !mManager->CanSend(): file /build/firefox-sx15yn/firefox-113.0.1+build1/dom/ipc/jsactor/JSWindowActorChild.cpp:57
+[Child 45126, Main Thread] WARNING: JSWindowActorChild::SendRawMessage (Conduits, ConduitClosed) not sent: !CanSend() || !mManager || !mManager->CanSend(): file /build/firefox-sx15yn/firefox-113.0.1+build1/dom/ipc/jsactor/JSWindowActorChild.cpp:57
+[Child 45126, Main Thread] WARNING: JSWindowActorChild::SendRawMessage (Conduits, ConduitClosed) not sent: !CanSend() || !mManager || !mManager->CanSend(): file /build/firefox-sx15yn/firefox-113.0.1+build1/dom/ipc/jsactor/JSWindowActorChild.cpp:57
+[Child 45126, Main Thread] WARNING: JSWindowActorChild::SendRawMessage (Conduits, ConduitClosed) not sent: !CanSend() || !mManager || !mManager->CanSend(): file /build/firefox-sx15yn/firefox-113.0.1+build1/dom/ipc/jsactor/JSWindowActorChild.cpp:57
+[Child 45126, Main Thread] WARNING: JSWindowActorChild::SendRawMessage (Conduits, ConduitClosed) not sent: !CanSend() || !mManager || !mManager->CanSend(): file /build/firefox-sx15yn/firefox-113.0.1+build1/dom/ipc/jsactor/JSWindowActorChild.cpp:57
+[Child 45126, Main Thread] WARNING: JSWindowActorChild::SendRawMessage (Conduits, ConduitClosed) not sent: !CanSend() || !mManager || !mManager->CanSend(): file /build/firefox-sx15yn/firefox-113.0.1+build1/dom/ipc/jsactor/JSWindowActorChild.cpp:57
+[Child 45126, Main Thread] WARNING: JSWindowActorChild::SendRawMessage (Conduits, ConduitClosed) not sent: !CanSend() || !mManager || !mManager->CanSend(): file /build/firefox-sx15yn/firefox-113.0.1+build1/dom/ipc/jsactor/JSWindowActorChild.cpp:57
+1684341919618	Marionette	INFO	Stopped listening on port 44881

@@ -18,3 +18,15 @@ password.send_keys(data['password'])
 
 button = driver.find_elements(By.CLASS_NAME, "button_btn__dCMn2")[2]
 button.click()
+
+# capturing the chart
+driver.get("https://binomo.com/trading")
+
+canvas = driver.find_elements(By.CLASS_NAME, "chart")
+print(canvas)
+
+# get the canvas as a PNG base64 string
+#canvas_base64 = driver.execute_script("return arguments[0].toDataURL('image/png').substring(21);", canvas)
+
+# decode
+#canvas_png = base64.b64decode(canvas_base64)
