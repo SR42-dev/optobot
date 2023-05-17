@@ -64,7 +64,7 @@ h = size['height']
 width = x + w
 height = y + h
 
-
+curTime = time.time()
 while True:
 
     # initializing array of points
@@ -120,6 +120,11 @@ while True:
         button.click()
     else:
         pass
+
+    fps = 1 / (time.time() - curTime)
+    curTime = time.time()
+    cv2.putText(points, '{0:.2f}'.format(fps), (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (100, 255, 0), 1, cv2.LINE_AA)
+    cv2.putText(points, '{0:.2f}'.format((1 / fps) * 1000), (10, 55), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (100, 255, 0), 1, cv2.LINE_AA)
 
     cv2.imshow('Window', points)
     # exit condition
