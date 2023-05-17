@@ -8,4 +8,6 @@ This behaviour is demonstrated by the fact that the site does not allow users to
 This is on top of the fact that I've personally been banned from the site while actively testing the algorithms on SR42-dev/optobot-approaches for merely using an auto-clicker. 
 The case strengthens when you realize the risk-reward ratio on the site is artificially capped at 0.83 to 1. An approach that clearly shows that people trading on this site are clearly misled into taking large risks for fewer gains than their original investment.
 
-However, the positive risk reward ratio does allow us to use arbitrage betting tactics against the platform in order to skew the return ratio in our favour by bringing it below 100%. This application seeks to embody that principle.
+A preliminary surevey shows that this corporation clearly has the social media influence to whitewash its tactics and make it seem like a legitimate trading platform. However, the fact that it's not regulated by any financial authority and is based in Barbados, a known tax haven, while its founders are Indian should be enough to raise some red flags with respect to any approaches to handle this legally. 
+
+Therefore, we can attempt to take advantage of the positive risk reward ratio which allows us to use arbitrage betting tactics against the platform in order to skew the return ratio in our favour by bringing it below 100%, thereby gaining the user a quick buck that takes away from the cash holdings of the corporation itself. 
