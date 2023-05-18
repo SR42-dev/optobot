@@ -15,58 +15,63 @@ input : list of points in tuple format (x, y) where x is the time and y is the p
         an integer indicating the x coordinate of the finish line
 output : string stating "up" or "down" 
 '''
-def predict(prices, x1):
+def predict(prices):
 
-    df = pd.DataFrame(prices, columns=['time', 'price'])
-    df.drop_duplicates(subset='time', keep='first', inplace=True)
+    try:
 
-    forecasttill = x1 - df['time'].max() # number of points to forecast
+        df = pd.DataFrame(prices, columns=['time', 'price'])
+        df.drop_duplicates(subset='time', keep='first', inplace=True)
 
-    # tunable hyperparameters
-    tts = 0.2 # train-test split
-    alpha = 0.05 # confidence interval
-    p = 3 # AR parameter
-    d = 2 # differencing parameter
-    q = 1 # MA parameter
+        forecasttill = 10 # number of points to forecast
 
-    series = df['price']
+        # tunable parameters
+        tts = 0.2 # train-test split
+        alpha = 0.05 # confidence interval
+        p = 3 # AR parameter
+        d = 2 # differencing parameter
+        q = 1 # MA parameter
 
-    # split into train and test sets
-    X = series.values
-    size = int(len(X) * tts)
-    train, test = X[0:size], X[size:len(X)]
-    history = [x for x in train]
-    predictions = list()
+        series = df['price']
 
-    # walk-forward validation
-    for t in range(len(test)):
+        # split into train and test sets
+        X = series.values
+        size = int(len(X) * tts)
+        train, test = X[0:size], X[size:len(X)]
+        history = [x for x in train]
+        predictions = list()
 
-        model = ARIMA(history, order=(p,d,q))
-        model_fit = model.fit()
+        # walk-forward validation
+        for t in range(len(test)):
 
-        output = model_fit.forecast()
-        yhat = output[0]
-        predictions.append(yhat)
+            model = ARIMA(history, order=(p,d,q))
+            model_fit = model.fit()
 
-        obs = test[t]
-        history.append(obs)
+            output = model_fit.forecast()
+            yhat = output[0]
+            predictions.append(yhat)
 
-    # Forecast
-    forecast = model_fit.forecast(forecasttill, alpha=alpha)  
-    forecast = forecast.tolist()
+            obs = test[t]
+            history.append(obs)
 
-    cur = int(test[len(test)-1])
-    pred = int(forecast[len(forecast)-1])
+        forecast = model_fit.forecast(forecasttill, alpha=alpha)  
+        forecast = forecast.tolist()
 
-    if pred > cur:
-        return "up"
-    elif pred < cur:
-        return "down"
-    else:
+        cur = int(test[len(test)-1])
+        pred = int(forecast[len(forecast)-1])
+
+        if pred > cur:
+            return "up"
+        elif pred < cur:
+            return "down"
+        else:
+            return "none"
+        
+    except:
+            
         return "none"
 
 
-# driver profile settings
+# driver profile settings and options
 ffprofile = webdriver.FirefoxProfile()
 ffprofile.set_preference("dom.webnotifications.enabled", False)
 
@@ -104,6 +109,11 @@ width = x + w
 height = y + h
 
 curTime = time.time()
+
+# hyperparameters
+frame = 0
+threshold = 10
+
 while True:
 
     # initializing array of points
@@ -126,7 +136,7 @@ while True:
     for j, contour in enumerate(contours):
         bbox = cv2.boundingRect(contour)
         top = (bbox[0] + (bbox[2] // 2), bbox[1])
-        cv2.circle(points, top, 5, (255, 255, 255), -1)
+    #   cv2.circle(points, top, 5, (255, 255, 255), -1)
         prices.append(top)
 
     # finding the bottoms of the red candles
@@ -136,36 +146,40 @@ while True:
     for j, contour in enumerate(contours):
         bbox = cv2.boundingRect(contour)
         bottom = (bbox[0] + (bbox[2] // 2), bbox[1] + bbox[3])
-        cv2.circle(points, bottom, 5, (255, 255, 255), -1)
+    #   cv2.circle(points, bottom, 5, (255, 255, 255), -1)
         prices.append(bottom)
 
     # locating the finish line
-    finishMask = cv2.inRange(img, np.array([172 , 32 , 130]), np.array([179 , 153 , 225]))
+    #finishMask = cv2.inRange(img, np.array([172 , 32 , 130]), np.array([179 , 153 , 225]))
 
     # finding finish flag contour
-    contours, _ = cv2.findContours(finishMask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    for j, contour in enumerate(contours):
-        bbox = cv2.boundingRect(contour)
-        x1 = bbox[0] + (bbox[2] // 2)
-    cv2.line(points, (x1, 0), (x1, 876), (255, 255, 255), 2)
+    #contours, _ = cv2.findContours(finishMask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    #for j, contour in enumerate(contours):
+    #    bbox = cv2.boundingRect(contour)
+    #    x1 = bbox[0] + (bbox[2] // 2)
+    #cv2.line(points, (x1, 0), (x1, 876), (255, 255, 255), 2)
 
-    decision = predict(prices, x1)
+    decision = predict(prices)
 
-    if decision == "up":
+    if decision == "up" and frame > threshold:
         button = driver.find_elements(By.CLASS_NAME, "button_btn__dCMn2")[4]
         button.click()
-    elif decision == "down":
+        frame = 0
+    elif decision == "down" and frame > threshold:
         button = driver.find_elements(By.CLASS_NAME, "button_btn__dCMn2")[5]
         button.click()
+        frame = 0
     else:
         pass
 
-    fps = 1 / (time.time() - curTime)
-    curTime = time.time()
-    cv2.putText(points, '{0:.2f}'.format(fps), (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (100, 255, 0), 1, cv2.LINE_AA)
-    cv2.putText(points, '{0:.2f}'.format((1 / fps) * 1000), (10, 55), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (100, 255, 0), 1, cv2.LINE_AA)
+    #fps = 1 / (time.time() - curTime)
+    #curTime = time.time()
+    #cv2.putText(points, '{0:.2f}'.format(fps), (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (100, 255, 0), 1, cv2.LINE_AA)
+    #cv2.putText(points, '{0:.2f}'.format((1 / fps) * 1000), (10, 55), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (100, 255, 0), 1, cv2.LINE_AA)
 
-    cv2.imshow('Window', points)
+    #cv2.imshow('Window', points)
+    frame += 1
+
     # exit condition
     if cv2.waitKey(1) & 0xFF == ord('q'):
 
