@@ -4,8 +4,10 @@ import time
 import base64
 import numpy as np
 import pandas as pd
+from math import sqrt
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from statsmodels.tsa.arima.model import ARIMA
 
 # prediction pipeline 
 '''
@@ -15,16 +17,53 @@ output : string stating "up" or "down"
 '''
 def predict(prices, x1):
 
-    #df = pd.DataFrame(prices, columns=['time', 'price'])
-    #df['price'] = 876 - df['price']
-    #df = df.sort_values(by=['time'], ascending=True)
-    #df.drop_duplicates(subset='time', keep='first', inplace=True)
-    
-    #plt.scatter(df['time'], df['price'])
-    #plt.plot(df['time'], df['price'])
-    #plt.show()
+    df = pd.DataFrame(prices, columns=['time', 'price'])
+    df.drop_duplicates(subset='time', keep='first', inplace=True)
 
-    return "None"
+    forecasttill = x1 - df['time'].max() # number of points to forecast
+
+    # tunable hyperparameters
+    tts = 0.2 # train-test split
+    alpha = 0.05 # confidence interval
+    p = 3 # AR parameter
+    d = 2 # differencing parameter
+    q = 1 # MA parameter
+
+    series = df['price']
+
+    # split into train and test sets
+    X = series.values
+    size = int(len(X) * tts)
+    train, test = X[0:size], X[size:len(X)]
+    history = [x for x in train]
+    predictions = list()
+
+    # walk-forward validation
+    for t in range(len(test)):
+
+        model = ARIMA(history, order=(p,d,q))
+        model_fit = model.fit()
+
+        output = model_fit.forecast()
+        yhat = output[0]
+        predictions.append(yhat)
+
+        obs = test[t]
+        history.append(obs)
+
+    # Forecast
+    forecast = model_fit.forecast(forecasttill, alpha=alpha)  
+    forecast = forecast.tolist()
+
+    cur = int(test[len(test)-1])
+    pred = int(forecast[len(forecast)-1])
+
+    if pred > cur:
+        return "up"
+    elif pred < cur:
+        return "down"
+    else:
+        return "none"
 
 
 # driver profile settings
