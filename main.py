@@ -1,6 +1,5 @@
 import cv2
 import json
-import time
 import base64
 import numpy as np
 import pandas as pd
@@ -9,27 +8,31 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from statsmodels.tsa.arima.model import ARIMA
 
+# tunable parameters
+
+tts = 0.2 # train-test split (lower the better in this case)
+alpha = 0.05 # confidence interval
+p = 3 # AR parameter
+d = 2 # differencing parameter
+q = 1 # MA parameter
+forecasttill = 10 # number of points to forecast
+threshold = 10 # number of frames to wait before placing a trade
+
+
 # prediction pipeline 
 '''
 input : list of points in tuple format (x, y) where x is the time and y is the price
         an integer indicating the x coordinate of the finish line
-output : string stating "up" or "down" 
+output : string stating "up", "down" or "none" to skip the prediction
 '''
 def predict(prices):
 
     try:
 
+        global tts, alpha, p, d, q, forecasttill
+
         df = pd.DataFrame(prices, columns=['time', 'price'])
         df.drop_duplicates(subset='time', keep='first', inplace=True)
-
-        forecasttill = 10 # number of points to forecast
-
-        # tunable parameters
-        tts = 0.2 # train-test split
-        alpha = 0.05 # confidence interval
-        p = 3 # AR parameter
-        d = 2 # differencing parameter
-        q = 1 # MA parameter
 
         series = df['price']
 
@@ -75,6 +78,7 @@ def predict(prices):
 ffprofile = webdriver.FirefoxProfile()
 ffprofile.set_preference("dom.webnotifications.enabled", False)
 
+# web driver initialization
 driver = webdriver.Firefox(ffprofile)
 driver.get("https://binomo.com/trading")
 driver.maximize_window()
@@ -94,8 +98,8 @@ password.send_keys(data['password'])
 button = driver.find_elements(By.CLASS_NAME, "button_btn__dCMn2")[2]
 button.click()
 
-#time.sleep(10)
-input("Press Enter to continue...")
+# waiting for the user to complete the captcha
+input("Complete the Captcha and press Enter to continue...")
 
 # capturing the location of the canvas
 canvas = driver.find_elements(By.TAG_NAME, "canvas")[0]
@@ -108,12 +112,7 @@ h = size['height']
 width = x + w
 height = y + h
 
-curTime = time.time()
-
-# hyperparameters
 frame = 0
-threshold = 10
-
 while True:
 
     # initializing array of points
@@ -136,7 +135,6 @@ while True:
     for j, contour in enumerate(contours):
         bbox = cv2.boundingRect(contour)
         top = (bbox[0] + (bbox[2] // 2), bbox[1])
-    #   cv2.circle(points, top, 5, (255, 255, 255), -1)
         prices.append(top)
 
     # finding the bottoms of the red candles
@@ -146,18 +144,7 @@ while True:
     for j, contour in enumerate(contours):
         bbox = cv2.boundingRect(contour)
         bottom = (bbox[0] + (bbox[2] // 2), bbox[1] + bbox[3])
-    #   cv2.circle(points, bottom, 5, (255, 255, 255), -1)
         prices.append(bottom)
-
-    # locating the finish line
-    #finishMask = cv2.inRange(img, np.array([172 , 32 , 130]), np.array([179 , 153 , 225]))
-
-    # finding finish flag contour
-    #contours, _ = cv2.findContours(finishMask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    #for j, contour in enumerate(contours):
-    #    bbox = cv2.boundingRect(contour)
-    #    x1 = bbox[0] + (bbox[2] // 2)
-    #cv2.line(points, (x1, 0), (x1, 876), (255, 255, 255), 2)
 
     decision = predict(prices)
 
@@ -171,13 +158,7 @@ while True:
         frame = 0
     else:
         pass
-
-    #fps = 1 / (time.time() - curTime)
-    #curTime = time.time()
-    #cv2.putText(points, '{0:.2f}'.format(fps), (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (100, 255, 0), 1, cv2.LINE_AA)
-    #cv2.putText(points, '{0:.2f}'.format((1 / fps) * 1000), (10, 55), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (100, 255, 0), 1, cv2.LINE_AA)
-
-    #cv2.imshow('Window', points)
+    
     frame += 1
 
     # exit condition
